@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Notas - Moderno</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+          },
+        },
+      },
+    }
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-500 via-blue-800 to-blue-500 min-h-screen font-sans flex">
+
+  <aside class="w-64 h-screen bg-white/20 backdrop-blur-md text-white p-6 border-r border-white/30 hidden sm:flex flex-col">
+    <img 
+      class="logo cursor-pointer mb-6 sm:w-56 rounded-2xl shadow-lg bg-white/10 p-2 border border-white/30 backdrop-blur-sm transition-all hover:scale-105"
+      src="../Shopping-cart/assets/IMG_0148-Logo-ColegioCristao-900x550.png"
+      alt="Logo Colégio"
+    />
+    <h2 class="text-3xl font-bold mb-8">Menu</h2>
+    <nav class="flex flex-col py-3 text-xl gap-2">
+      <button class="py-2 hover:text-blue-300 transition" data-section="perfil">👤 Perfil</button>
+      <button class="py-2 hover:text-blue-300 transition" data-section="notas">📋 Notas</button>
+      <button class="py-2 hover:text-blue-300 transition" data-section="config">⚙️ Configurações</button>
+      <button class="py-2 hover:text-blue-300 transition" data-section="contato">📞 Contato</button>
+      <button class="py-2 hover:text-blue-300 transition" data-section="ajuda">❓ Central de Ajuda</button>
+    </nav>
+  </aside>
+
+  <main id="main-content" class="flex-1 h-full p-6 overflow-y-auto"></main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const botoes = document.querySelectorAll('aside button');
+      const main = document.getElementById('main-content');
+
+      const rotas = {
+        notas: 'notas.html',
+        config: 'config.html',
+        perfil: 'perfil.html',
+        contato: 'contato.html',
+        ajuda: `<div class="text-white text-2xl">
+          <h2 class="text-4xl font-bold mb-4">❓ Central de Ajuda</h2>
+          <p>FAQ, vídeos tutoriais, perguntas frequentes...</p>
+        </div>`
+      };
+
+      async function carregarConteudo(secao) {
+        main.innerHTML = `<p class="text-white text-2xl font-bold">Carregando...</p>`; // Feedback de carregamento
+        
+        if (!rotas[secao]) {
+          main.innerHTML = `<p class="text-white text-xl">Seção não encontrada.</p>`;
+          return;
+        }
+
+        if (rotas[secao].endsWith('.html')) {
+          try {
+            const res = await fetch(rotas[secao]);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const html = await res.text();
+            main.innerHTML = html;
+
+            const scriptExistente = document.getElementById('script-notas');
+            if (scriptExistente) scriptExistente.remove();
+
+            if (secao === 'notas') {
+              const script = document.createElement('script');
+              script.id = 'script-notas';
+              script.src = 'script.js';
+              script.defer = true;
+              script.onload = () => {
+                if (typeof initNotas === 'function') {
+                  initNotas();
+                }
+              };
+              document.body.appendChild(script);
+            }
+          } catch (error) {
+            console.error("Falha ao carregar conteúdo:", error);
+            // ** Mensagem de erro clara para o usuário **
+            main.innerHTML = `<div class="text-yellow-300 bg-red-800/50 p-6 rounded-xl text-xl">
+              <h2 class="font-bold text-3xl mb-3">Erro ao Carregar</h2>
+              <p>Ocorreu um erro ao tentar carregar a seção '${secao}'.</p>
+              <p class="mt-4 font-bold">Isso geralmente acontece ao abrir o arquivo 'index.html' diretamente.</p>
+              <p>Por favor, execute este projeto a partir de um servidor local. Veja as instruções no terminal ou documentação.</p>
+            </div>`;
+          }
+        } else {
+          main.innerHTML = rotas[secao];
+        }
+      }
+
+      // Carrega "Notas" ao abrir
+      carregarConteudo('notas');
+
+      botoes.forEach(botao => {
+        botao.addEventListener('click', () => {
+          carregarConteudo(botao.dataset.section);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
