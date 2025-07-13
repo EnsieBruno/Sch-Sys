@@ -34,3 +34,5 @@ Acesse o link de página presente nesse repositório.
 
 
 ![image](https://github.com/user-attachments/assets/52e3bb8b-37d0-4292-aa7d-3e7fe988f1a7)
+
+⭐ Este projeto foi criado com fins educacionais e pode ser evoluído para atender mais demandas escolares com foco em usabilidade, acessibilidade e integração de dados.
